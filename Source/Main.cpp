@@ -12,7 +12,6 @@
 #include "JuceDemoHeader.h"
 #include "MainWindow.h"
 #include "Leap.h"
-#include <cctype>
 
 //==============================================================================
 class JuceLeapFWApplication  : public JUCEApplication
@@ -48,15 +47,8 @@ public:
         quit();
     }
 
-    void anotherInstanceStarted (const String& /*commandLine*/)
+    void anotherInstanceStarted (const String& /*commandLine*/) override
     {
-    }
-
-	static Leap::Controller& getController() 
-    {
-        static Leap::Controller s_controller;
-
-        return  s_controller;
     }
 
 private:

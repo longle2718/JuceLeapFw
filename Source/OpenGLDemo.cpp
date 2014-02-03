@@ -25,7 +25,10 @@
 
 #include "JuceDemoHeader.h"
 #include "WavefrontObjParser.h"
-
+#include "Leap.h"
+#include "LeapUtil.h"
+#include "LeapUtilGL.h"
+#include <cctype>
 
 //==============================================================================
 struct OpenGLDemoClasses
@@ -390,7 +393,6 @@ struct OpenGLDemoClasses
 
             addAndMakeVisible (presetBox);
             presetBox.addListener (this);
-
             Array<ShaderPreset> presets (getPresets());
             StringArray presetNames;
 
@@ -400,7 +402,7 @@ struct OpenGLDemoClasses
             addAndMakeVisible (presetLabel);
             presetLabel.setText ("Shader Preset:", dontSendNotification);
             presetLabel.attachToComponent (&presetBox, true);
-
+			
             addAndMakeVisible (textureLabel);
             textureLabel.setText ("Texture:", dontSendNotification);
             textureLabel.attachToComponent (&textureBox, true);
@@ -569,6 +571,7 @@ struct OpenGLDemoClasses
         OwnedArray<DemoTexture> textures;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DemoControlsOverlay)
+
     };
 
     //==============================================================================
@@ -576,7 +579,8 @@ struct OpenGLDemoClasses
         it implements the OpenGLRenderer callback so that it can do real GL work.
     */
     class OpenGLDemo  : public Component,
-                        private OpenGLRenderer
+                        private OpenGLRenderer,
+						Leap::Listener
     {
     public:
         OpenGLDemo()
@@ -584,7 +588,7 @@ struct OpenGLDemoClasses
               scale (0.5f), rotationSpeed (0.0f), rotation (0.0f),
               textureToUse (nullptr)
         {
-            //MainAppWindow::getMainAppWindow()->setRenderingEngine (0);
+            MainAppWindow::getMainAppWindow()->setRenderingEngine (0);
 
             setOpaque (true);
             addAndMakeVisible (controlsOverlay = new DemoControlsOverlay (*this));
@@ -594,6 +598,12 @@ struct OpenGLDemoClasses
             openGLContext.setContinuousRepainting (true);
 
             controlsOverlay->initialise();
+
+			OpenGLDemoClasses::getController().addListener( *this );
+			initColors();
+			m_fFrameScale = 0.0075f;
+			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -2.0f, 0.5f );
+			m_fPointableRadius = 0.05f;
         }
 
         ~OpenGLDemo()
@@ -681,6 +691,9 @@ struct OpenGLDemoClasses
 
             if (! controlsOverlay->isMouseButtonDown())
                 rotation += (float) rotationSpeed;
+
+			Leap::Frame frame = m_lastFrame;
+			drawPointables(frame);
         }
 
         Matrix3D<float> getProjectionMatrix() const
@@ -725,7 +738,97 @@ struct OpenGLDemoClasses
         float scale, rotationSpeed;
         BouncingNumber bouncingNumber;
 
+		void initColors()
+		{
+		  float fMin      = 0.0f;
+		  float fMax      = 1.0f;
+		  float fNumSteps = static_cast<float>(pow( kNumColors, 1.0/3.0 ));
+		  float fStepSize = (fMax - fMin)/fNumSteps;
+		  float fR = fMin, fG = fMin, fB = fMin;
+
+		  for ( uint32_t i = 0; i < kNumColors; i++ )
+		  {
+			m_avColors[i] = Leap::Vector( fR, fG, LeapUtil::Min(fB, fMax) );
+
+			fR += fStepSize;
+
+			if ( fR > fMax )
+			{
+			  fR = fMin;
+			  fG += fStepSize;
+
+			  if ( fG > fMax )
+			  {
+				fG = fMin;
+				fB += fStepSize;
+			  }
+			}
+		  }
+
+		  Random rng(0x13491349);
+
+		  for ( uint32_t i = 0; i < kNumColors; i++ )
+		  {
+			uint32_t      uiRandIdx    = i + (rng.nextInt() % (kNumColors - i));
+			Leap::Vector  vSwapTemp    = m_avColors[i];
+
+			m_avColors[i]          = m_avColors[uiRandIdx];
+			m_avColors[uiRandIdx]  = vSwapTemp;
+		  }
+		}
+
+		virtual void onFrame(const Leap::Controller& controller)
+		{
+			Leap::Frame frame = controller.frame();
+			m_lastFrame = frame;
+		}
+
+		void drawPointables( Leap::Frame frame )
+		{
+			LeapUtilGL::GLAttribScope colorScope( GL_CURRENT_BIT | GL_LINE_BIT );
+
+			const Leap::PointableList& pointables = frame.pointables();
+
+			const float fScale = m_fPointableRadius;
+
+			glLineWidth( 3.0f );
+
+			for ( size_t i = 0, e = pointables.count(); i < e; i++ )
+			{
+				const Leap::Pointable&  pointable   = pointables[i];
+				Leap::Vector            vStartPos   = m_mtxFrameTransform.transformPoint( pointable.tipPosition() * m_fFrameScale );
+				Leap::Vector            vEndPos     = m_mtxFrameTransform.transformDirection( pointable.direction() ) * -0.25f;
+				const uint32_t          colorIndex  = static_cast<uint32_t>(pointable.id()) % kNumColors;
+
+				glColor3fv( m_avColors[colorIndex].toFloatPointer() );
+
+				{
+					LeapUtilGL::GLMatrixScope matrixScope;
+
+					glTranslatef( vStartPos.x, vStartPos.y, vStartPos.z );
+
+					glBegin(GL_LINES);
+
+					glVertex3f( 0, 0, 0 );
+					glVertex3fv( vEndPos.toFloatPointer() );
+
+					glEnd();
+
+					glScalef( fScale, fScale, fScale );
+
+					LeapUtilGL::drawSphere( LeapUtilGL::kStyle_Solid );
+				}
+			}
+		}
+
     private:
+		Leap::Frame                 m_lastFrame;
+		enum  { kNumColors = 256 };
+		Leap::Vector            m_avColors[kNumColors];
+		float                       m_fPointableRadius;
+		Leap::Matrix                m_mtxFrameTransform;
+		float                       m_fFrameScale;
+
         void drawBackground2DStuff (float desktopScale)
         {
             // Create an OpenGLGraphicsContext that will draw into this GL window..
@@ -784,7 +887,6 @@ struct OpenGLDemoClasses
 
         BackgroundStar stars[3];
 
-        //==============================================================================
         void updateShader()
         {
             if (newVertexShader.isNotEmpty() || newFragmentShader.isNotEmpty())
@@ -836,14 +938,14 @@ struct OpenGLDemoClasses
         const char* vertexShader;
         const char* fragmentShader;
     };
-
-    static Array<ShaderPreset> getPresets()
+	
+	static Array<ShaderPreset> getPresets()
     {
         #define SHADER_DEMO_HEADER \
-            "/*  This is a live OpenGL Shader demo.\n" \
-            "    Edit the shader program below and it will be \n" \
-            "    compiled and applied to the model above!\n" \
-            "*/\n\n"
+            "//  This is a live OpenGL Shader demo.\n" \
+            "//  Edit the shader program below and it will be \n" \
+            "//  compiled and applied to the model above!\n" \
+            "//\n\n"
 
         ShaderPreset presets[] =
         {
@@ -1206,6 +1308,13 @@ struct OpenGLDemoClasses
         };
 
         return Array<ShaderPreset> (presets, numElementsInArray (presets));
+    }
+
+	static Leap::Controller& getController() 
+    {
+        static Leap::Controller s_controller;
+
+        return  s_controller;
     }
 };
 

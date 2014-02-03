@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="QAwXU8" name="JuceLeapFw" projectType="guiapp" version="1.0.0"
+              bundleIdentifier="com.yourcompany.Finger2D" includeBinaryInAppConfig="1"
+              jucerVersion="3.1.0">
+  <MAINGROUP id="v17Qdu" name="JuceLeapFw">
+    <GROUP id="{646669D8-F9CF-49A6-485A-4FD0FEA774EE}" name="Source">
+      <GROUP id="{B59CEF7A-57AD-43BD-7A8C-FA346081D843}" name="Resources">
+        <FILE id="jtR5Ie" name="brushed_aluminium.png" compile="0" resource="1"
+              file="Resources/brushed_aluminium.png"/>
+        <FILE id="L9XAMp" name="portmeirion.jpg" compile="0" resource="1" file="Resources/portmeirion.jpg"/>
+        <FILE id="im2az1" name="teapot.obj" compile="0" resource="1" file="Resources/teapot.obj"/>
+      </GROUP>
+      <FILE id="KFVbab" name="DemoUtilities.h" compile="0" resource="0" file="Source/DemoUtilities.h"/>
+      <FILE id="brv2L4" name="JuceDemoHeader.h" compile="0" resource="0"
+            file="Source/JuceDemoHeader.h"/>
+      <FILE id="lGqmiG" name="LeapUtil.cpp" compile="1" resource="0" file="Source/LeapUtil.cpp"/>
+      <FILE id="A8DSad" name="LeapUtil.h" compile="0" resource="0" file="Source/LeapUtil.h"/>
+      <FILE id="hfAo2Z" name="LeapUtilGL.cpp" compile="1" resource="0" file="Source/LeapUtilGL.cpp"/>
+      <FILE id="fKWlAt" name="LeapUtilGL.h" compile="0" resource="0" file="Source/LeapUtilGL.h"/>
+      <FILE id="kOMHaV" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="gpY5ln" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
+      <FILE id="W52alw" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
+      <FILE id="vDLDam" name="OpenGLDemo.cpp" compile="1" resource="0" file="Source/OpenGLDemo.cpp"/>
+      <FILE id="wOq5Md" name="WavefrontObjParser.h" compile="0" resource="0"
+            file="Source/WavefrontObjParser.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <VS2010 targetFolder="Builds/VisualStudio2010" externalLibraries="Leapd.lib">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Finger2D" headerPath="$(LEAP_SDK)\include"
+                       libraryPath="$(LEAP_SDK)\lib\x86" postbuildCommand="xcopy /y $(LEAP_SDK)\lib\x86\Leapd.dll &quot;$(TargetDir)&quot;&#10;xcopy /y $(LEAP_SDK)\lib\x86\msvcp100d.dll &quot;$(TargetDir)&quot;&#10;xcopy /y $(LEAP_SDK)\lib\x86\msvcr100d.dll &quot;$(TargetDir)&quot;"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="2" targetName="Finger2D"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../juce/modules"/>
+        <MODULEPATH id="juce_events" path="../juce/modules"/>
+        <MODULEPATH id="juce_graphics" path="../juce/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../juce/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../juce/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../juce/modules"/>
+        <MODULEPATH id="juce_opengl" path="../juce/modules"/>
+      </MODULEPATHS>
+    </VS2010>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULES id="juce_core" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_events" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="1"/>
+  </MODULES>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>

@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{3B6EC5D2-C430-22A2-10E8-9BAE14400FEC}") = "JuceLeapFw", "JuceLeapFw.vcxproj", "{27D6DE1F-EEA2-1057-0E10-7C1C62FC8ED6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27D6DE1F-EEA2-1057-0E10-7C1C62FC8ED6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{27D6DE1F-EEA2-1057-0E10-7C1C62FC8ED6}.Debug|Win32.Build.0 = Debug|Win32
+		{27D6DE1F-EEA2-1057-0E10-7C1C62FC8ED6}.Release|Win32.ActiveCfg = Release|Win32
+		{27D6DE1F-EEA2-1057-0E10-7C1C62FC8ED6}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

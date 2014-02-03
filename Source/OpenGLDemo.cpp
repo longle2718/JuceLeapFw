@@ -601,13 +601,14 @@ struct OpenGLDemoClasses
 
 			OpenGLDemoClasses::getController().addListener( *this );
 			initColors();
-			m_fFrameScale = 0.0075f;
-			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -2.0f, 0.5f );
-			m_fPointableRadius = 0.05f;
+			m_fFrameScale = 0.005f;
+			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -1.0f, 0.0f );
+			m_fPointableRadius = 0.025f;
         }
 
         ~OpenGLDemo()
         {
+			OpenGLDemoClasses::getController().removeListener( *this );
             openGLContext.detach();
         }
 
@@ -645,11 +646,6 @@ struct OpenGLDemoClasses
             if (doBackgroundDrawing)
                 drawBackground2DStuff (desktopScale);
 
-            updateShader();   // Check whether we need to compile a new shader
-
-            if (shader == nullptr)
-                return;
-
             // Having used the juce 2D renderer, it will have messed-up a whole load of GL state, so
             // we need to initialise some important settings before doing our normal GL 3D drawing..
             glEnable (GL_DEPTH_TEST);
@@ -658,6 +654,15 @@ struct OpenGLDemoClasses
             glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             openGLContext.extensions.glActiveTexture (GL_TEXTURE0);
             glEnable (GL_TEXTURE_2D);
+
+			// Draw the Leap frame
+			Leap::Frame frame = m_lastFrame;
+			drawPointables(frame);
+
+			updateShader();   // Check whether we need to compile a new shader
+
+            if (shader == nullptr)
+                return;
 
             glViewport (0, 0, roundToInt (desktopScale * getWidth()), roundToInt (desktopScale * getHeight()));
 
@@ -691,9 +696,6 @@ struct OpenGLDemoClasses
 
             if (! controlsOverlay->isMouseButtonDown())
                 rotation += (float) rotationSpeed;
-
-			Leap::Frame frame = m_lastFrame;
-			drawPointables(frame);
         }
 
         Matrix3D<float> getProjectionMatrix() const
@@ -824,7 +826,7 @@ struct OpenGLDemoClasses
     private:
 		Leap::Frame                 m_lastFrame;
 		enum  { kNumColors = 256 };
-		Leap::Vector            m_avColors[kNumColors];
+		Leap::Vector				m_avColors[kNumColors];
 		float                       m_fPointableRadius;
 		Leap::Matrix                m_mtxFrameTransform;
 		float                       m_fFrameScale;

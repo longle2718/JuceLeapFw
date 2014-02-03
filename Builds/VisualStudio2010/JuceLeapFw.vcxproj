@@ -34,7 +34,7 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</OutDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Finger2D</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">JuceLeapFw</TargetName>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LibraryPath);$(LEAP_SDK)\lib\x86</LibraryPath>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release\</OutDir>
@@ -68,11 +68,11 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)\Finger2D.exe</OutputFile>
+      <OutputFile>$(OutDir)\JuceLeapFw.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>libcmt.lib; msvcrt.lib;;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(IntDir)\Finger2D.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(IntDir)\JuceLeapFw.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -82,7 +82,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>$(IntDir)\Finger2D.bsc</OutputFile>
+      <OutputFile>$(IntDir)\JuceLeapFw.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
       <Command>xcopy /y $(LEAP_SDK)\lib\x86\Leapd.dll &quot;$(TargetDir)&quot;
@@ -1362,6 +1362,7 @@ xcopy /y $(LEAP_SDK)\lib\x86\msvcr100d.dll &quot;$(TargetDir)&quot;</Command>
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\juce_icon.png"/>
     <None Include="..\..\Resources\brushed_aluminium.png"/>
     <None Include="..\..\Resources\portmeirion.jpg"/>
     <None Include="..\..\Resources\teapot.obj"/>

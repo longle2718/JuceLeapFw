@@ -466,7 +466,7 @@ private:
 
 //==============================================================================
 static ScopedPointer<ApplicationCommandManager> applicationCommandManager;
-static ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
+//static ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
 
 MainAppWindow::MainAppWindow()
     : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(),
@@ -505,7 +505,7 @@ MainAppWindow::~MainAppWindow()
     clearContentComponent();
     contentComponent = nullptr;
     applicationCommandManager = nullptr;
-    sharedAudioDeviceManager = nullptr;
+    //sharedAudioDeviceManager = nullptr;
 
    #if JUCE_OPENGL
     openGLContext.detach();
@@ -525,6 +525,7 @@ ApplicationCommandManager& MainAppWindow::getApplicationCommandManager()
     return *applicationCommandManager;
 }
 
+/*
 AudioDeviceManager& MainAppWindow::getSharedAudioDeviceManager()
 {
     if (sharedAudioDeviceManager == nullptr)
@@ -535,6 +536,7 @@ AudioDeviceManager& MainAppWindow::getSharedAudioDeviceManager()
 
     return *sharedAudioDeviceManager;
 }
+*/
 
 MainAppWindow* MainAppWindow::getMainAppWindow()
 {

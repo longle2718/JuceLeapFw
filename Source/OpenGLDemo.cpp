@@ -381,7 +381,7 @@ struct OpenGLDemoClasses
 
             textures.add (new BuiltInTexture ("Portmeirion", BinaryData::portmeirion_jpg, BinaryData::portmeirion_jpgSize));
             textures.add (new BuiltInTexture ("Brushed aluminium", BinaryData::brushed_aluminium_png, BinaryData::brushed_aluminium_pngSize));
-            //textures.add (new BuiltInTexture ("JUCE logo", BinaryData::juce_icon_png, BinaryData::juce_icon_pngSize));
+            textures.add (new BuiltInTexture ("JUCE logo", BinaryData::juce_icon_png, BinaryData::juce_icon_pngSize));
             textures.add (new DynamicTexture());
 
             addAndMakeVisible (textureBox);

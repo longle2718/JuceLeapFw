@@ -12,6 +12,7 @@
 #include "JuceDemoHeader.h"
 #include "MainWindow.h"
 #include "Leap.h"
+#include <cctype>
 
 //==============================================================================
 class JuceLeapFWApplication  : public JUCEApplication

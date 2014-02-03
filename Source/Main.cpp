@@ -9,18 +9,17 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Leap.h"
-#include "LeapUtilGL.h"
-#include <cctype>
 #include "JuceDemoHeader.h"
 #include "MainWindow.h"
+#include "Leap.h"
+#include <cctype>
 
 //==============================================================================
-class Finger2DApplication  : public JUCEApplication
+class JuceLeapFWApplication  : public JUCEApplication
 {
 public:
     //==============================================================================
-    Finger2DApplication() {}
+    JuceLeapFWApplication() {}
 
     const String getApplicationName()       { return ProjectInfo::projectName; }
     const String getApplicationVersion()    { return ProjectInfo::versionString; }
@@ -66,4 +65,4 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (Finger2DApplication)
+START_JUCE_APPLICATION (JuceLeapFWApplication)

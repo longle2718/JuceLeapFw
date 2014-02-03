@@ -27,6 +27,7 @@
 #define __JUCEDEMOHEADER_H_EE664D1A__
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MainWindow.h"
 #include "DemoUtilities.h"
 
 

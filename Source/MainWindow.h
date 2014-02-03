@@ -46,7 +46,7 @@ public:
     static ApplicationCommandManager& getApplicationCommandManager();
 
     // (returns a shared AudioDeviceManager object that all the demos can use)
-    static AudioDeviceManager& getSharedAudioDeviceManager();
+    //static AudioDeviceManager& getSharedAudioDeviceManager();
 
     StringArray getRenderingEngines() const;
     int getActiveRenderingEngine() const;

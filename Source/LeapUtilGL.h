@@ -47,8 +47,12 @@ void drawBox( eStyle style );
 
 void drawCylinder( eStyle style, eAxis axis );
 
+void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length );
+
 /// disk is double-side
 void drawDisk( eStyle style, ePlane plane );
+
+void drawDisk(Leap::Vector vCenter, Leap::Vector vNormal);
 
 /// arrow is drawn with unlit colored lines.
 void drawArrow( eAxis axis );

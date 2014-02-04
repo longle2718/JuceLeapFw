@@ -427,6 +427,61 @@ void drawCylinder( eStyle style, eAxis axis )
     break;
   }
 }
+void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length )
+{
+  GLMatrixScope matrixScope;
+
+  switch ( style )
+  {
+   case kStyle_Outline:
+    gluQuadricDrawStyle(s_quadric, GLU_SILHOUETTE);
+    glPushAttrib( GL_LIGHTING_BIT );
+    glDisable(GL_LIGHTING);
+    break;
+
+   case kStyle_Solid:
+    gluQuadricDrawStyle(s_quadric, GLU_FILL);
+    break;
+  }
+
+  switch ( axis )
+  {
+  case kAxis_X:
+    glRotatef( 90.0f, 0, 1, 0 );
+    break;
+  case kAxis_Y:
+    glRotatef( 90.0f, 1, 0, 0 );
+    break;
+  case kAxis_Z:
+    break;
+  }
+
+  // draw end caps
+  if ( style != kStyle_Outline )
+  {
+    GLMatrixScope matrixScope;
+
+    glTranslatef( 0, 0, 0.5f );
+    drawDisk( style, kPlane_XY );
+
+    glTranslatef( 0, 0, -1.0f );
+    drawDisk( style, kPlane_XY );
+  }
+
+  glTranslatef( 0, 0, -0.5f );
+
+  gluCylinder( s_quadric, radius, radius, length, 32, 32 );
+
+  switch ( style )
+  {
+   case kStyle_Outline:
+    glPopAttrib();
+    break;
+
+   case kStyle_Solid:
+    break;
+  }
+}
 
 void drawDisk( eStyle style, ePlane plane )
 {
@@ -470,6 +525,27 @@ void drawDisk( eStyle style, ePlane plane )
    case kStyle_Solid:
     break;
   }
+}
+
+void drawDisk(Leap::Vector vCenter, Leap::Vector vNormal)
+{
+	LeapUtilGL::GLMatrixScope matrixScope;
+	Vector orthX, orthY, orthZ;
+
+	gluQuadricDrawStyle(s_quadric, GLU_SILHOUETTE);
+    glPushAttrib( GL_LIGHTING_BIT );
+    glDisable(GL_LIGHTING);
+
+	glTranslatef( vCenter.x, vCenter.y, vCenter.z );
+	orthX = vNormal.cross(Vector::xAxis());
+	glRotatef((float)(vNormal.angleTo(Vector::xAxis())/3.1416*180.0), orthX.x, orthX.y, orthX.z);
+	orthY = vNormal.cross(Vector::yAxis());
+	glRotatef((float)(vNormal.angleTo(Vector::yAxis())/3.1416*180.0), orthY.x, orthY.y, orthY.z);
+	orthZ = vNormal.cross(Vector::zAxis());
+	glRotatef((float)(vNormal.angleTo(Vector::zAxis())/3.1416*180.0), orthZ.x, orthZ.y, orthZ.z);
+	gluDisk(s_quadric, 0, 0.1f, 32, 1);
+
+	glPopAttrib();
 }
 
 void drawArrow( eAxis axis )

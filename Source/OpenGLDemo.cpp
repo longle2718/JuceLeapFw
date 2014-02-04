@@ -352,9 +352,9 @@ struct OpenGLDemoClasses
             sizeSlider.setRange (0.0, 1.0, 0.001);
             sizeSlider.addListener (this);
 
-            addAndMakeVisible (zoomLabel);
-            zoomLabel.setText ("Zoom:", dontSendNotification);
-            zoomLabel.attachToComponent (&sizeSlider, true);
+            addAndMakeVisible (sizeLabel);
+            sizeLabel.setText ("Size:", dontSendNotification);
+            sizeLabel.attachToComponent (&sizeSlider, true);
 
             addAndMakeVisible (speedSlider);
             speedSlider.setRange (0.0, 0.5, 0.001);
@@ -431,7 +431,7 @@ struct OpenGLDemoClasses
             top.removeFromRight (70);
             statusLabel.setBounds (top);
 
-            Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 2));
+            Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 8));
 
             Rectangle<int> presets (shaderArea.removeFromTop (25));
             presets.removeFromLeft (100);
@@ -556,7 +556,7 @@ struct OpenGLDemoClasses
 
         OpenGLDemo& demo;
 
-        Label speedLabel, zoomLabel;
+        Label speedLabel, sizeLabel;
 
         CodeDocument vertexDocument, fragmentDocument;
         CodeEditorComponent vertexEditorComp, fragmentEditorComp;
@@ -602,7 +602,7 @@ struct OpenGLDemoClasses
 			OpenGLDemoClasses::getController().addListener( *this );
 			initColors();
 			m_fFrameScale = 0.005f;
-			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -1.0f, 0.0f );
+			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -0.5f, 0.125f );
 			m_fPointableRadius = 0.025f;
         }
 
@@ -657,8 +657,23 @@ struct OpenGLDemoClasses
 
 			// Draw the Leap frame
 			Leap::Frame frame = m_lastFrame;
-			drawPointables(frame);
+			drawLeapFrame(frame);
 
+			// Draw the region of interest
+			{
+				LeapUtilGL::GLMatrixScope matrixScope;
+
+				glTranslatef(0.5, 0, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1, 1.0);
+				glTranslatef(-1, 0, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1, 1.0);
+				glTranslatef(0.5, 0.5, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1, 1.0);
+				glTranslatef(0, -1, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1, 1.0);
+			}
+
+			/*
 			updateShader();   // Check whether we need to compile a new shader
 
             if (shader == nullptr)
@@ -696,6 +711,7 @@ struct OpenGLDemoClasses
 
             if (! controlsOverlay->isMouseButtonDown())
                 rotation += (float) rotationSpeed;
+			*/
         }
 
         Matrix3D<float> getProjectionMatrix() const
@@ -779,46 +795,57 @@ struct OpenGLDemoClasses
 		  }
 		}
 
+
+
 		virtual void onFrame(const Leap::Controller& controller)
 		{
 			Leap::Frame frame = controller.frame();
 			m_lastFrame = frame;
 		}
 
-		void drawPointables( Leap::Frame frame )
+		void drawLeapFrame( Leap::Frame frame )
 		{
 			LeapUtilGL::GLAttribScope colorScope( GL_CURRENT_BIT | GL_LINE_BIT );
-
-			const Leap::PointableList& pointables = frame.pointables();
-
-			const float fScale = m_fPointableRadius;
-
 			glLineWidth( 3.0f );
 
-			for ( size_t i = 0, e = pointables.count(); i < e; i++ )
+			const float fScale = m_fPointableRadius;			
+			const Leap::HandList& hands = frame.hands();
+
+			for (size_t j = 0, m = hands.count(); j < m; j++)
 			{
-				const Leap::Pointable&  pointable   = pointables[i];
-				Leap::Vector            vStartPos   = m_mtxFrameTransform.transformPoint( pointable.tipPosition() * m_fFrameScale );
-				Leap::Vector            vEndPos     = m_mtxFrameTransform.transformDirection( pointable.direction() ) * -0.25f;
-				const uint32_t          colorIndex  = static_cast<uint32_t>(pointable.id()) % kNumColors;
+				const Leap::Hand& hand = hands[j];
+				Leap::Vector palmPos = m_mtxFrameTransform.transformPoint( hand.palmPosition() * m_fFrameScale );
+				Leap::Vector palmNor = m_mtxFrameTransform.transformPoint( hand.palmNormal() * m_fFrameScale );
+				Leap::Vector palmDir = m_mtxFrameTransform.transformPoint( hand.direction() * m_fFrameScale );
 
-				glColor3fv( m_avColors[colorIndex].toFloatPointer() );
+				LeapUtilGL::drawDisk( palmPos, palmNor );
 
+				const Leap::PointableList& pointables = hand.pointables();
+				for ( size_t i = 0, n = pointables.count(); i < n; i++ )
 				{
-					LeapUtilGL::GLMatrixScope matrixScope;
+					const Leap::Pointable&  pointable   = pointables[i];
+					Leap::Vector            vStartPos   = m_mtxFrameTransform.transformPoint( pointable.tipPosition() * m_fFrameScale );
+					Leap::Vector            vEndPos     = m_mtxFrameTransform.transformDirection( pointable.direction() ) * -0.25f;
+					const uint32_t          colorIndex  = static_cast<uint32_t>(pointable.id()) % kNumColors;
 
-					glTranslatef( vStartPos.x, vStartPos.y, vStartPos.z );
+					glColor3fv( m_avColors[colorIndex].toFloatPointer() );
 
-					glBegin(GL_LINES);
+					{
+						LeapUtilGL::GLMatrixScope matrixScope;
 
-					glVertex3f( 0, 0, 0 );
-					glVertex3fv( vEndPos.toFloatPointer() );
+						glTranslatef( vStartPos.x, vStartPos.y, vStartPos.z );
 
-					glEnd();
+						glBegin(GL_LINES);
 
-					glScalef( fScale, fScale, fScale );
+						glVertex3f( 0, 0, 0 );
+						glVertex3fv( vEndPos.toFloatPointer() );
 
-					LeapUtilGL::drawSphere( LeapUtilGL::kStyle_Solid );
+						glEnd();
+
+						glScalef( fScale, fScale, fScale );
+
+						LeapUtilGL::drawSphere( LeapUtilGL::kStyle_Solid );
+					}
 				}
 			}
 		}

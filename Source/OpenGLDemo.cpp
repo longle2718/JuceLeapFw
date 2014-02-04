@@ -445,12 +445,14 @@ struct OpenGLDemoClasses
 
         void mouseDown (const MouseEvent& e) override
         {
-            demo.draggableOrientation.mouseDown (e.getPosition());
+            //demo.draggableOrientation.mouseDown (e.getPosition());
+			demo.camera.OnMouseDown( LeapUtil::FromVector2( e.getPosition() ) );
         }
 
         void mouseDrag (const MouseEvent& e) override
         {
-            demo.draggableOrientation.mouseDrag (e.getPosition());
+            //demo.draggableOrientation.mouseDrag (e.getPosition());
+			demo.camera.OnMouseMoveOrbit( LeapUtil::FromVector2( e.getPosition() ) );
         }
 
         void mouseWheelMove (const MouseEvent&, const MouseWheelDetails& d) override
@@ -601,6 +603,7 @@ struct OpenGLDemoClasses
 
 			OpenGLDemoClasses::getController().addListener( *this );
 			initColors();
+			resetCamera();
 			m_fFrameScale = 0.005f;
 			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -0.5f, 0.125f );
 			m_fPointableRadius = 0.025f;
@@ -655,13 +658,16 @@ struct OpenGLDemoClasses
             openGLContext.extensions.glActiveTexture (GL_TEXTURE0);
             glEnable (GL_TEXTURE_2D);
 
+			LeapUtilGL::GLMatrixScope sceneMatrixScope;
+			setupScene();
+
 			// Draw the Leap frame
 			Leap::Frame frame = m_lastFrame;
 			drawLeapFrame(frame);
 
 			// Draw the region of interest
 			{
-				LeapUtilGL::GLMatrixScope matrixScope;
+				LeapUtilGL::GLMatrixScope roiMatrixScope;
 
 				glTranslatef(0.5, 0, 0);
 				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1, 1.0);
@@ -751,11 +757,6 @@ struct OpenGLDemoClasses
             draggableOrientation.setViewport (getLocalBounds());
         }
 
-        Draggable3DOrientation draggableOrientation;
-        bool doBackgroundDrawing;
-        float scale, rotationSpeed;
-        BouncingNumber bouncingNumber;
-
 		void initColors()
 		{
 		  float fMin      = 0.0f;
@@ -795,7 +796,23 @@ struct OpenGLDemoClasses
 		  }
 		}
 
+		void resetCamera()
+		{
+			camera.SetOrbitTarget( Leap::Vector::zero() );
+			camera.SetPOVLookAt( Leap::Vector( 0, 2, 4 ), camera.GetOrbitTarget() );
+		}
 
+		/// affects model view matrix.  needs to be inside a glPush/glPop matrix block!
+		void setupScene()
+		{
+			camera.SetAspectRatio( getWidth() / static_cast<float>(getHeight()) );
+
+			camera.SetupGLProjection();
+
+			camera.ResetGLView();
+
+			camera.SetupGLView();
+		}
 
 		virtual void onFrame(const Leap::Controller& controller)
 		{
@@ -850,6 +867,12 @@ struct OpenGLDemoClasses
 			}
 		}
 
+		Draggable3DOrientation draggableOrientation;
+        bool doBackgroundDrawing;
+        float scale, rotationSpeed;
+        BouncingNumber bouncingNumber;
+		LeapUtilGL::CameraGL        camera;
+
     private:
 		Leap::Frame                 m_lastFrame;
 		enum  { kNumColors = 256 };
@@ -857,41 +880,6 @@ struct OpenGLDemoClasses
 		float                       m_fPointableRadius;
 		Leap::Matrix                m_mtxFrameTransform;
 		float                       m_fFrameScale;
-
-        void drawBackground2DStuff (float desktopScale)
-        {
-            // Create an OpenGLGraphicsContext that will draw into this GL window..
-            ScopedPointer<LowLevelGraphicsContext> glRenderer (createOpenGLGraphicsContext (openGLContext,
-                                                                                            roundToInt (desktopScale * getWidth()),
-                                                                                            roundToInt (desktopScale * getHeight())));
-
-            if (glRenderer != nullptr)
-            {
-                Graphics g (*glRenderer);
-                g.addTransform (AffineTransform::scale (desktopScale));
-
-                for (int i = 0; i < numElementsInArray (stars); ++i)
-                {
-                    float size = 0.25f;
-
-                    // This stuff just creates a spinning star shape and fills it..
-                    Path p;
-                    p.addStar (Point<float> (getWidth() * stars[i].x.getValue(),
-                                             getHeight() * stars[i].y.getValue()), 7,
-                               getHeight() * size * 0.5f,
-                               getHeight() * size,
-                               stars[i].angle.getValue());
-
-                    float hue = stars[i].hue.getValue();
-
-                    g.setGradientFill (ColourGradient (Colours::green.withRotatedHue (hue).withAlpha (0.8f),
-                                                       0, 0,
-                                                       Colours::red.withRotatedHue (hue).withAlpha (0.5f),
-                                                       0, (float) getHeight(), false));
-                    g.fillPath (p);
-                }
-            }
-        }
 
         OpenGLContext openGLContext;
 
@@ -954,6 +942,41 @@ struct OpenGLDemoClasses
 
                 newVertexShader = String::empty;
                 newFragmentShader = String::empty;
+            }
+        }
+
+		void drawBackground2DStuff (float desktopScale)
+        {
+            // Create an OpenGLGraphicsContext that will draw into this GL window..
+            ScopedPointer<LowLevelGraphicsContext> glRenderer (createOpenGLGraphicsContext (openGLContext,
+                                                                                            roundToInt (desktopScale * getWidth()),
+                                                                                            roundToInt (desktopScale * getHeight())));
+
+            if (glRenderer != nullptr)
+            {
+                Graphics g (*glRenderer);
+                g.addTransform (AffineTransform::scale (desktopScale));
+
+                for (int i = 0; i < numElementsInArray (stars); ++i)
+                {
+                    float size = 0.25f;
+
+                    // This stuff just creates a spinning star shape and fills it..
+                    Path p;
+                    p.addStar (Point<float> (getWidth() * stars[i].x.getValue(),
+                                             getHeight() * stars[i].y.getValue()), 7,
+                               getHeight() * size * 0.5f,
+                               getHeight() * size,
+                               stars[i].angle.getValue());
+
+                    float hue = stars[i].hue.getValue();
+
+                    g.setGradientFill (ColourGradient (Colours::green.withRotatedHue (hue).withAlpha (0.8f),
+                                                       0, 0,
+                                                       Colours::red.withRotatedHue (hue).withAlpha (0.5f),
+                                                       0, (float) getHeight(), false));
+                    g.fillPath (p);
+                }
             }
         }
 

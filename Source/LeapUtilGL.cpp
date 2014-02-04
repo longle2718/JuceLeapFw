@@ -462,10 +462,10 @@ void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length )
     GLMatrixScope matrixScope;
 
     glTranslatef( 0, 0, 0.5f );
-    drawDisk( style, kPlane_XY );
+    drawDisk( style, kPlane_XY, radius );
 
     glTranslatef( 0, 0, -1.0f );
-    drawDisk( style, kPlane_XY );
+    drawDisk( style, kPlane_XY, radius );
   }
 
   glTranslatef( 0, 0, -0.5f );
@@ -526,7 +526,49 @@ void drawDisk( eStyle style, ePlane plane )
     break;
   }
 }
+void drawDisk( eStyle style, ePlane plane, GLfloat radius )
+{
+  GLMatrixScope matrixScope;
 
+  switch ( style )
+  {
+   case kStyle_Outline:
+    gluQuadricDrawStyle(s_quadric, GLU_SILHOUETTE);
+    glPushAttrib( GL_LIGHTING_BIT );
+    glDisable(GL_LIGHTING);
+    break;
+
+   case kStyle_Solid:
+    gluQuadricDrawStyle(s_quadric, GLU_FILL);
+    break;
+  }
+
+  switch ( plane )
+  {
+  case kPlane_XY:
+    break;
+  case kPlane_YZ:
+    glRotatef( 90.0f, 0, 1, 0 );
+    break;
+  case kPlane_ZX:
+    glRotatef( -90.0f, 1, 0, 0 );
+    break;
+  }
+
+  gluDisk(s_quadric, 0, radius, 32, 1);
+  glRotatef( 180.0f, 0, 1, 0 );
+  gluDisk(s_quadric, 0, radius, 32, 1);
+
+  switch ( style )
+  {
+   case kStyle_Outline:
+    glPopAttrib();
+    break;
+
+   case kStyle_Solid:
+    break;
+  }
+}
 void drawDisk(Leap::Vector vCenter, Leap::Vector vNormal)
 {
 	LeapUtilGL::GLMatrixScope matrixScope;

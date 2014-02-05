@@ -572,19 +572,17 @@ void drawDisk( eStyle style, ePlane plane, GLfloat radius )
 void drawDisk(Leap::Vector vCenter, Leap::Vector vNormal)
 {
 	LeapUtilGL::GLMatrixScope matrixScope;
-	Vector orthX, orthY, orthZ;
+	GLAttribScope attribScope( GL_CURRENT_BIT|GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT );
 
 	gluQuadricDrawStyle(s_quadric, GLU_SILHOUETTE);
     glPushAttrib( GL_LIGHTING_BIT );
     glDisable(GL_LIGHTING);
 
+	glColor3f( 1, 0, 0 );
+
 	glTranslatef( vCenter.x, vCenter.y, vCenter.z );
-	orthX = vNormal.cross(Vector::xAxis());
-	glRotatef((float)(vNormal.angleTo(Vector::xAxis())/3.1416*180.0), orthX.x, orthX.y, orthX.z);
-	orthY = vNormal.cross(Vector::yAxis());
-	glRotatef((float)(vNormal.angleTo(Vector::yAxis())/3.1416*180.0), orthY.x, orthY.y, orthY.z);
-	orthZ = vNormal.cross(Vector::zAxis());
-	glRotatef((float)(vNormal.angleTo(Vector::zAxis())/3.1416*180.0), orthZ.x, orthZ.y, orthZ.z);
+	Vector orth = vNormal.cross(Vector::zAxis());
+	glRotatef(-vNormal.angleTo(Vector::zAxis())/3.1416f*180.0f, orth.x, orth.y, orth.z);
 	gluDisk(s_quadric, 0, 0.1f, 32, 1);
 
 	glPopAttrib();

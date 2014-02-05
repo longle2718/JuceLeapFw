@@ -670,13 +670,13 @@ struct OpenGLDemoClasses
 				LeapUtilGL::GLMatrixScope roiMatrixScope;
 
 				glTranslatef(0.5, 0, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1, 1.0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f);
 				glTranslatef(-1, 0, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1, 1.0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f);
 				glTranslatef(0.5, 0.5, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1, 1.0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f);
 				glTranslatef(0, -1, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1, 1.0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f);
 			}
 
 			/*
@@ -832,8 +832,7 @@ struct OpenGLDemoClasses
 			{
 				const Leap::Hand& hand = hands[j];
 				Leap::Vector palmPos = m_mtxFrameTransform.transformPoint( hand.palmPosition() * m_fFrameScale );
-				Leap::Vector palmNor = m_mtxFrameTransform.transformPoint( hand.palmNormal() * m_fFrameScale );
-				Leap::Vector palmDir = m_mtxFrameTransform.transformPoint( hand.direction() * m_fFrameScale );
+				Leap::Vector palmNor = m_mtxFrameTransform.transformDirection( hand.palmNormal() );
 
 				LeapUtilGL::drawDisk( palmPos, palmNor );
 
@@ -842,20 +841,21 @@ struct OpenGLDemoClasses
 				{
 					const Leap::Pointable&  pointable   = pointables[i];
 					Leap::Vector            vStartPos   = m_mtxFrameTransform.transformPoint( pointable.tipPosition() * m_fFrameScale );
-					Leap::Vector            vEndPos     = m_mtxFrameTransform.transformDirection( pointable.direction() ) * -0.25f;
-					const uint32_t          colorIndex  = static_cast<uint32_t>(pointable.id()) % kNumColors;
+					Leap::Vector            vEndPos     = m_mtxFrameTransform.transformDirection( pointable.direction() ) * -0.125f;
 
-					glColor3fv( m_avColors[colorIndex].toFloatPointer() );
+					glColor3f( 1, 0, 0 );
 
 					{
 						LeapUtilGL::GLMatrixScope matrixScope;
-
+						
 						glTranslatef( vStartPos.x, vStartPos.y, vStartPos.z );
 
 						glBegin(GL_LINES);
 
 						glVertex3f( 0, 0, 0 );
 						glVertex3fv( vEndPos.toFloatPointer() );
+						glVertex3fv( vEndPos.toFloatPointer() );
+						glVertex3fv( (palmPos-vStartPos).toFloatPointer() );
 
 						glEnd();
 

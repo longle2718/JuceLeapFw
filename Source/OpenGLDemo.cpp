@@ -348,13 +348,13 @@ struct OpenGLDemoClasses
             statusLabel.setColour (Label::textColourId, Colours::black);
             statusLabel.setFont (Font (14.0f));
 
-            addAndMakeVisible (sizeSlider);
-            sizeSlider.setRange (0.0, 1.0, 0.001);
-            sizeSlider.addListener (this);
+            //addAndMakeVisible (sizeSlider);
+            //sizeSlider.setRange (0.0, 1.0, 0.001);
+            //sizeSlider.addListener (this);
 
-            addAndMakeVisible (sizeLabel);
-            sizeLabel.setText ("Size:", dontSendNotification);
-            sizeLabel.attachToComponent (&sizeSlider, true);
+            //addAndMakeVisible (sizeLabel);
+            //sizeLabel.setText ("Size:", dontSendNotification);
+            //sizeLabel.attachToComponent (&sizeSlider, true);
 
             addAndMakeVisible (speedSlider);
             speedSlider.setRange (0.0, 0.5, 0.001);
@@ -414,7 +414,7 @@ struct OpenGLDemoClasses
             textureBox.setSelectedItemIndex (0);
             presetBox.setSelectedItemIndex (0);
             speedSlider.setValue (0.01);
-            sizeSlider.setValue (0.5);
+            //sizeSlider.setValue (0.5);
         }
 
         void resized() override
@@ -426,7 +426,7 @@ struct OpenGLDemoClasses
             Rectangle<int> sliders (top.removeFromRight (area.getWidth() / 2));
             showBackgroundToggle.setBounds (sliders.removeFromBottom (25));
             speedSlider.setBounds (sliders.removeFromBottom (25));
-            sizeSlider.setBounds (sliders.removeFromBottom (25));
+            //sizeSlider.setBounds (sliders.removeFromBottom (25));
 
             top.removeFromRight (70);
             statusLabel.setBounds (top);
@@ -457,12 +457,14 @@ struct OpenGLDemoClasses
 
         void mouseWheelMove (const MouseEvent&, const MouseWheelDetails& d) override
         {
-            sizeSlider.setValue (sizeSlider.getValue() + d.deltaY);
+            //sizeSlider.setValue (sizeSlider.getValue() + d.deltaY);
+			demo.camera.OnMouseWheel( d.deltaY );
         }
 
         void mouseMagnify (const MouseEvent&, float magnifyAmmount) override
         {
-            sizeSlider.setValue (sizeSlider.getValue() + magnifyAmmount - 1.0f);
+			(void) magnifyAmmount;
+            //sizeSlider.setValue (sizeSlider.getValue() + magnifyAmmount - 1.0f);
         }
 
         void selectPreset (int preset)
@@ -520,7 +522,7 @@ struct OpenGLDemoClasses
     private:
         void sliderValueChanged (Slider*) override
         {
-            demo.scale = (float) sizeSlider.getValue();
+            //demo.scale = (float) sizeSlider.getValue();
             demo.rotationSpeed = (float) speedSlider.getValue();
         }
 
@@ -558,7 +560,8 @@ struct OpenGLDemoClasses
 
         OpenGLDemo& demo;
 
-        Label speedLabel, sizeLabel;
+        Label speedLabel;//, sizeLabel;
+		Slider speedSlider;//, sizeSlider;
 
         CodeDocument vertexDocument, fragmentDocument;
         CodeEditorComponent vertexEditorComp, fragmentEditorComp;
@@ -567,7 +570,6 @@ struct OpenGLDemoClasses
         ComboBox presetBox, textureBox;
         Label presetLabel, textureLabel;
 
-        Slider speedSlider, sizeSlider;
         ToggleButton showBackgroundToggle;
 
         OwnedArray<DemoTexture> textures;
@@ -814,7 +816,7 @@ struct OpenGLDemoClasses
 			camera.SetupGLView();
 		}
 
-		virtual void onFrame(const Leap::Controller& controller)
+		void onFrame(const Leap::Controller& controller) override
 		{
 			Leap::Frame frame = controller.frame();
 			m_lastFrame = frame;

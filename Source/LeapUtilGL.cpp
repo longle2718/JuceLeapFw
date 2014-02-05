@@ -427,7 +427,7 @@ void drawCylinder( eStyle style, eAxis axis )
     break;
   }
 }
-void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length )
+void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length, const Colour &color )
 {
   GLMatrixScope matrixScope;
 
@@ -443,6 +443,8 @@ void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length )
     gluQuadricDrawStyle(s_quadric, GLU_FILL);
     break;
   }
+
+  glColor3f( color.getFloatRed(), color.getFloatGreen(), color.getFloatBlue() );
 
   switch ( axis )
   {

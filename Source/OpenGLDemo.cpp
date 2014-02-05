@@ -607,7 +607,7 @@ struct OpenGLDemoClasses
 			initColors();
 			resetCamera();
 			m_fFrameScale = 0.005f;
-			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -0.5f, 0.125f );
+			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -1.0f, 0.125f );
 			m_fPointableRadius = 0.025f;
         }
 
@@ -666,20 +666,6 @@ struct OpenGLDemoClasses
 			// Draw the Leap frame
 			Leap::Frame frame = m_lastFrame;
 			drawLeapFrame(frame);
-
-			// Draw the region of interest
-			{
-				LeapUtilGL::GLMatrixScope roiMatrixScope;
-
-				glTranslatef(0.5, 0, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f);
-				glTranslatef(-1, 0, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f);
-				glTranslatef(0.5, 0.5, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f);
-				glTranslatef(0, -1, 0);
-				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f);
-			}
 
 			/*
 			updateShader();   // Check whether we need to compile a new shader
@@ -829,6 +815,8 @@ struct OpenGLDemoClasses
 
 			const float fScale = m_fPointableRadius;			
 			const Leap::HandList& hands = frame.hands();
+			Colour leftClr(Colours::white), rightClr(Colours::white), 
+				upClr(Colours::white), downClr(Colours::white);
 
 			for (size_t j = 0, m = hands.count(); j < m; j++)
 			{
@@ -865,7 +853,42 @@ struct OpenGLDemoClasses
 
 						LeapUtilGL::drawSphere( LeapUtilGL::kStyle_Solid );
 					}
+
+					// Check for intersection with the cylinders
+					if (vStartPos.distanceTo(Leap::Vector(vStartPos.x, vStartPos.y, 0)) <= 0.1)
+					{
+						if (vStartPos.y>=0.4 && vStartPos.y<=0.6 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
+						{
+							upClr = Colours::red;
+						}
+						if (vStartPos.y>=-0.6 && vStartPos.y<=-0.4 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
+						{
+							downClr = Colours::red;
+						}
+						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=0.4 && vStartPos.x<=0.6)
+						{
+							rightClr = Colours::red;
+						}
+						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=-0.6 && vStartPos.x<=-0.4)
+						{
+							leftClr = Colours::red;
+						}
+					}
 				}
+			}
+
+			// Draw the region of interest
+			{
+				LeapUtilGL::GLMatrixScope roiMatrixScope;
+
+				glTranslatef(0.5, 0, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f, rightClr);
+				glTranslatef(-1, 0, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_Y, 0.1f, 1.0f, leftClr);
+				glTranslatef(0.5, 0.5, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f, upClr);
+				glTranslatef(0, -1, 0);
+				drawCylinder(LeapUtilGL::kStyle_Solid, LeapUtilGL::kAxis_X, 0.1f, 1.0f, downClr);
 			}
 		}
 

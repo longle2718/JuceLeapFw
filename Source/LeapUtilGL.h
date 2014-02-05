@@ -21,6 +21,7 @@
 #endif // !__GL_H__
 
 #include "LeapUtil.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 namespace LeapUtilGL {
 
@@ -46,7 +47,7 @@ void drawQuad( eStyle style, ePlane plane );
 void drawBox( eStyle style );
 
 void drawCylinder( eStyle style, eAxis axis );
-void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length );
+void drawCylinder( eStyle style, eAxis axis, GLfloat radius, GLfloat length, const Colour &color );
 
 /// disk is double-side
 void drawDisk( eStyle style, ePlane plane );

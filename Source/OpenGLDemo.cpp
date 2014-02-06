@@ -839,6 +839,7 @@ struct OpenGLDemoClasses
 
 				// create variable for duty cycles: ch1, skip, ch2, ch3, ch4, ...
 				unsigned char dc[8] = {0,0,0,0,0,0,0,0};
+				float val = 0;
 
 				for ( size_t i = 0, n = pointables.count(); i < n; i++ )
 				{
@@ -873,32 +874,38 @@ struct OpenGLDemoClasses
 						if (vStartPos.y>=0.4 && vStartPos.y<=0.6 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
 						{
 							upClr = Colours::red;
-							// determine value, wrt M1
-
+							// determine value
+							val = int(255*(vStartPos.x/2+0.75));
 							// vibrate M1 (p3.0) and M2 (p3.2)
-							dc[0] = 255;
-							dc[2] = 255;
+							dc[0] = val;
+							dc[2] = 383-val;
 						}
 						if (vStartPos.y>=-0.6 && vStartPos.y<=-0.4 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
 						{
 							downClr = Colours::red;
+							// determine value
+							val = int(255*(vStartPos.x/2+0.75));
 							// vibrate M3 (p3.3) and M4 (p3.4)
-							dc[3] = 255;
-							dc[4] = 255;
+							dc[3] = 383-val;
+							dc[4] = val;
 						}
 						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=0.4 && vStartPos.x<=0.6)
 						{
 							rightClr = Colours::red;
+							// determine value
+							val = int(255*(vStartPos.y/2+0.75));
 							// vibrate M1 and M4
-							dc[0] = 255;
-							dc[4] = 255;
+							dc[0] = val;
+							dc[4] = 383-val;
 						}
 						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=-0.6 && vStartPos.x<=-0.4)
 						{
 							leftClr = Colours::red;
+							// determine value
+							val = int(255*(vStartPos.y/2+0.75));
 							// vibrate M2 and M3
-							dc[2] = 255;
-							dc[3] = 255;
+							dc[2] = val;
+							dc[3] = 383-val;
 						}
 					}
 				}

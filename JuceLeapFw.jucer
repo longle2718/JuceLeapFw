@@ -45,6 +45,7 @@
         <MODULEPATH id="juce_gui_extra" path="../juce/modules"/>
         <MODULEPATH id="juce_cryptography" path="../juce/modules"/>
         <MODULEPATH id="juce_opengl" path="../juce/modules"/>
+        <MODULEPATH id="juce_video" path="../juce/modules"/>
       </MODULEPATHS>
     </VS2010>
   </EXPORTFORMATS>
@@ -57,6 +58,7 @@
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_video" showAllCode="1" useLocalCopy="1"/>
   </MODULES>
-  <JUCEOPTIONS/>
+  <JUCEOPTIONS JUCE_USE_CAMERA="enabled"/>
 </JUCERPROJECT>

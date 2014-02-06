@@ -431,7 +431,7 @@ struct OpenGLDemoClasses
             top.removeFromRight (70);
             statusLabel.setBounds (top);
 
-            Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 8));
+            Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 4));
 
             Rectangle<int> presets (shaderArea.removeFromTop (25));
             presets.removeFromLeft (100);
@@ -584,7 +584,8 @@ struct OpenGLDemoClasses
     */
     class OpenGLDemo  : public Component,
                         private OpenGLRenderer,
-						Leap::Listener
+						Leap::Listener,
+						CameraDevice::Listener
     {
     public:
         OpenGLDemo()
@@ -599,22 +600,38 @@ struct OpenGLDemoClasses
 
             openGLContext.setRenderer (this);
             openGLContext.attachTo (*this);
-            openGLContext.setContinuousRepainting (true);
+            openGLContext.setContinuousRepainting (false);
 
             controlsOverlay->initialise();
 
 			OpenGLDemoClasses::getController().addListener( *this );
 			initColors();
 			resetCamera();
+			
 			m_fFrameScale = 0.005f;
 			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -1.0f, 0.125f );
 			m_fPointableRadius = 0.025f;
+			
+			StringArray camDevList = CameraDevice::getAvailableDevices();
+			camDevPtr = CameraDevice::openDevice(0);
+			if ( camDevPtr != nullptr)
+			{
+				camDevPtr->addListener( this );
+			}
         }
 
         ~OpenGLDemo()
         {
-			OpenGLDemoClasses::getController().removeListener( *this );
             openGLContext.detach();
+			
+			OpenGLDemoClasses::getController().removeListener( *this );
+			
+			if ( camDevPtr != nullptr)
+			{
+				camDevPtr->removeListener( this );
+				camDevPtr->~CameraDevice();
+			}
+			camDevPtr = nullptr;
         }
 
         void newOpenGLContextCreated() override
@@ -707,7 +724,7 @@ struct OpenGLDemoClasses
                 rotation += (float) rotationSpeed;
 			*/
         }
-
+		/*
         Matrix3D<float> getProjectionMatrix() const
         {
             float w = 1.0f / (scale + 0.1f);
@@ -725,7 +742,7 @@ struct OpenGLDemoClasses
 
             return viewMatrix * rotationMatrix;
         }
-
+		*/
         void setTexture (DemoTexture* t)
         {
             textureToUse = t;
@@ -806,6 +823,13 @@ struct OpenGLDemoClasses
 		{
 			Leap::Frame frame = controller.frame();
 			m_lastFrame = frame;
+			openGLContext.triggerRepaint();
+		}
+
+		void imageReceived(const Image &image) override
+		{
+			m_lastImage = image;
+			openGLContext.triggerRepaint();
 		}
 
 		void drawLeapFrame( Leap::Frame frame )
@@ -905,6 +929,8 @@ struct OpenGLDemoClasses
 		float                       m_fPointableRadius;
 		Leap::Matrix                m_mtxFrameTransform;
 		float                       m_fFrameScale;
+		CameraDevice*				camDevPtr;
+		Image						m_lastImage;
 
         OpenGLContext openGLContext;
 
@@ -922,12 +948,14 @@ struct OpenGLDemoClasses
 
         String newVertexShader, newFragmentShader;
 
+		/*
         struct BackgroundStar
         {
             SlowerBouncingNumber x, y, hue, angle;
         };
 
         BackgroundStar stars[3];
+		*/
 
         void updateShader()
         {
@@ -980,8 +1008,15 @@ struct OpenGLDemoClasses
             if (glRenderer != nullptr)
             {
                 Graphics g (*glRenderer);
-                g.addTransform (AffineTransform::scale (desktopScale));
-
+				//Image bg = ImageFileFormat::loadFrom (BinaryData::portmeirion_jpg, BinaryData::portmeirion_jpgSize);
+				
+                //g.addTransform (AffineTransform::scale (desktopScale*getWidth()/bg.getWidth(), 
+				//	desktopScale*getHeight()/bg.getHeight()));
+				g.addTransform (AffineTransform::scale (desktopScale*getWidth()/m_lastImage.getWidth(), 
+					desktopScale*getHeight()/m_lastImage.getHeight()));
+				g.drawImageAt( m_lastImage, 0, 0 );
+				
+				/*
                 for (int i = 0; i < numElementsInArray (stars); ++i)
                 {
                     float size = 0.25f;
@@ -1002,6 +1037,7 @@ struct OpenGLDemoClasses
                                                        0, (float) getHeight(), false));
                     g.fillPath (p);
                 }
+				*/
             }
         }
 

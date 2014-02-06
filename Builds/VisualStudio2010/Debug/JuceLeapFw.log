@@ -1,0 +1,30 @@
+﻿Build started 2/5/2014 4:46:53 PM.
+     1>Project "C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\JuceLeapFw.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\JuceLeapFw.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+       ResourceCompile:
+         All outputs are up-to-date.
+       Link:
+         All outputs are up-to-date.
+         JuceLeapFw.vcxproj -> C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\.\Debug\JuceLeapFw.exe
+       PostBuildEvent:
+         xcopy /y C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\Leapd.dll "C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\Debug\"
+         xcopy /y C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\msvcp100d.dll "C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\Debug\"
+         xcopy /y C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\msvcr100d.dll "C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\Debug\"
+         :VCEnd
+         C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\Leapd.dll
+         1 File(s) copied
+         C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\msvcp100d.dll
+         1 File(s) copied
+         C:\Users\davidjun\Downloads\LeapDeveloperKit\LeapSDK\lib\x86\msvcr100d.dll
+         1 File(s) copied
+       FinalizeBuildStatus:
+         Deleting file "Debug\JuceLeapFw.unsuccessfulbuild".
+         Touching "Debug\JuceLeapFw.lastbuildstate".
+     1>Done Building Project "C:\Users\davidjun\Documents\GitHub\JuceLeapFw\Builds\VisualStudio2010\JuceLeapFw.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.23

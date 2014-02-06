@@ -23,6 +23,7 @@
   ==============================================================================
 */
 
+#include "DAQMXclass.h"
 #include "JuceDemoHeader.h"
 #include "WavefrontObjParser.h"
 #include "Leap.h"
@@ -419,11 +420,11 @@ struct OpenGLDemoClasses
 
         void resized() override
         {
-            Rectangle<int> area (getLocalBounds().reduced (4));
+            juce::Rectangle<int> area (getLocalBounds().reduced (4));
 
-            Rectangle<int> top (area.removeFromTop (75));
+            juce::Rectangle<int> top (area.removeFromTop (75));
 
-            Rectangle<int> sliders (top.removeFromRight (area.getWidth() / 2));
+            juce::Rectangle<int> sliders (top.removeFromRight (area.getWidth() / 2));
             showBackgroundToggle.setBounds (sliders.removeFromBottom (25));
             speedSlider.setBounds (sliders.removeFromBottom (25));
             //sizeSlider.setBounds (sliders.removeFromBottom (25));
@@ -431,9 +432,9 @@ struct OpenGLDemoClasses
             top.removeFromRight (70);
             statusLabel.setBounds (top);
 
-            Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 8));
+            juce::Rectangle<int> shaderArea (area.removeFromBottom (area.getHeight() / 8));
 
-            Rectangle<int> presets (shaderArea.removeFromTop (25));
+            juce::Rectangle<int> presets (shaderArea.removeFromTop (25));
             presets.removeFromLeft (100);
             presetBox.setBounds (presets.removeFromLeft (150));
             presets.removeFromLeft (100);
@@ -609,11 +610,19 @@ struct OpenGLDemoClasses
 			m_fFrameScale = 0.005f;
 			m_mtxFrameTransform.origin = Leap::Vector( 0.0f, -1.0f, 0.125f );
 			m_fPointableRadius = 0.025f;
+
+			SP = new DAQMX("Dev1/port3/line0:7");
+
         }
 
         ~OpenGLDemo()
         {
 			OpenGLDemoClasses::getController().removeListener( *this );
+
+			unsigned char tmp[8] = {0,0,0,0,0,0,0,0};
+			SP->writePWM(tmp);
+			delete SP;
+
             openGLContext.detach();
         }
 
@@ -708,7 +717,7 @@ struct OpenGLDemoClasses
 			*/
         }
 
-        Matrix3D<float> getProjectionMatrix() const
+    /*    Matrix3D<float> getProjectionMatrix() const
         {
             float w = 1.0f / (scale + 0.1f);
             float h = w * getLocalBounds().toFloat().getAspectRatio (false);
@@ -724,7 +733,7 @@ struct OpenGLDemoClasses
             Matrix3D<float> rotationMatrix = viewMatrix.rotated (Vector3D<float> (rotation, rotation, -0.3f));
 
             return viewMatrix * rotationMatrix;
-        }
+        }*/
 
         void setTexture (DemoTexture* t)
         {
@@ -827,6 +836,10 @@ struct OpenGLDemoClasses
 				LeapUtilGL::drawDisk( palmPos, palmNor );
 
 				const Leap::PointableList& pointables = hand.pointables();
+
+				// create variable for duty cycles: ch1, skip, ch2, ch3, ch4, ...
+				unsigned char dc[8] = {0,0,0,0,0,0,0,0};
+
 				for ( size_t i = 0, n = pointables.count(); i < n; i++ )
 				{
 					const Leap::Pointable&  pointable   = pointables[i];
@@ -860,21 +873,38 @@ struct OpenGLDemoClasses
 						if (vStartPos.y>=0.4 && vStartPos.y<=0.6 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
 						{
 							upClr = Colours::red;
+							// determine value, wrt M1
+
+							// vibrate M1 (p3.0) and M2 (p3.2)
+							dc[0] = 255;
+							dc[2] = 255;
 						}
 						if (vStartPos.y>=-0.6 && vStartPos.y<=-0.4 && vStartPos.x>=-0.5 && vStartPos.x<=0.5)
 						{
 							downClr = Colours::red;
+							// vibrate M3 (p3.3) and M4 (p3.4)
+							dc[3] = 255;
+							dc[4] = 255;
 						}
 						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=0.4 && vStartPos.x<=0.6)
 						{
 							rightClr = Colours::red;
+							// vibrate M1 and M4
+							dc[0] = 255;
+							dc[4] = 255;
 						}
 						if (vStartPos.y>=-0.5 && vStartPos.y<=0.5 && vStartPos.x>=-0.6 && vStartPos.x<=-0.4)
 						{
 							leftClr = Colours::red;
+							// vibrate M2 and M3
+							dc[2] = 255;
+							dc[3] = 255;
 						}
 					}
 				}
+				// write new DC to DAQmx
+				SP->writePWM(dc);
+
 			}
 
 			// Draw the region of interest
@@ -905,6 +935,7 @@ struct OpenGLDemoClasses
 		float                       m_fPointableRadius;
 		Leap::Matrix                m_mtxFrameTransform;
 		float                       m_fFrameScale;
+		DAQMX*						SP;
 
         OpenGLContext openGLContext;
 
